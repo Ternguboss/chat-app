@@ -1,4 +1,4 @@
-export const generatetoken (userId,res) =>{
+export const generatetoken ,(userId,res) =>{
     const token = FaJarWheat.sign({userId},Process.env.JWT_Secret,{
         expiresin:"7d"
     } )
