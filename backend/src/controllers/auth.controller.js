@@ -2,54 +2,54 @@ import { generatetoken } from "../libs/utils.js"
 import User from "../models/user.model.js"
 import bcrypt from "bcryptjs"
 
-
-export const signup = async (req,res)=>{
-    const{Fullname, password,profilePic, email}= req.body
+export const signup = async (req, res) => {
+    const { Fullname, password, profilePic, email } = req.body
     try {
-        if (password.length < 6 ){
-            return res.status(400).json({message:"password must be at least 6 letters long "})
+        if (password.length < 6 ) {
+            return res.status(400).json({ message: "password must be at least 6 letters long" })
         }
-        const user = await User.findOne({email})
+        
+        // 1. Check if user already exists
+        const user = await User.findOne({ email })
+        if (user) return res.status(400).json({ message: "email already exists" }) // Fixed 'User' to 'user'
 
-        if (User) return res.status(400).json({message:"email already exist"})
-
+        // 2. Hash password
         const salt = await bcrypt.genSalt(10)
+        const hashedPassword = await bcrypt.hash(password, salt)
 
-        const hashedPassword = await bcrypt.hash(password,salt)
-
-        const newUser = newUser({
+        // 3. Create new instance using the 'User' model
+        const newUser = new User({ // Fixed 'newUser(' to 'new User('
             Fullname,
             email,
             password: hashedPassword,
+            profilePic // Added this so profilePic actually gets saved!
         })
 
-        if (newUser){
+        if (newUser) {
             // generate jwt token
             generatetoken(newUser._id, res)
             await newUser.save();
+            
             res.status(201).json({
-                _id:newUser._id,
+                _id: newUser._id,
                 Fullname: newUser.Fullname,
-                email:newUser.email,
-                profilePic:newUser.profilePic,
-
+                email: newUser.email,
+                profilePic: newUser.profilePic,
             })
-        } else{
-            res.status(400).json({message:"invalid user data"})
+        } else {
+            res.status(400).json({ message: "invalid user data" })
         }
 
     } catch (error) {
-        console.log("error in signup controller",error.message)
-        res.status(500).json({message:"internal service error"})
+        console.log("error in signup controller", error.message)
+        res.status(500).json({ message: "internal server error" })
     }
 }
 
-
-export const login = (req,res)=>{
+export const login = (req, res) => {
     res.send("login route");
 }
 
-
-export const logout  = (req,res)=>{
+export const logout = (req, res) => {
     res.send("logout route");
 }
