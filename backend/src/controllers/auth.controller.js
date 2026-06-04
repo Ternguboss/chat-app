@@ -53,3 +53,7 @@ export const login = (req, res) => {
 export const logout = (req, res) => {
     res.send("logout route");
 }
+
+export const updateProfile =(req, res)=>{
+    
+}

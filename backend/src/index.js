@@ -2,16 +2,17 @@ import express from "express"
 import dotenv from "dotenv"
 import authRoutes from "./routes/auth.routes.js"
 import { connectDB } from "./libs/db.js"
-
+import cookieParser from "cookie-parser"
 
 dotenv.config()
 const app = express()
 
 const PORT = process.env.PORT
-app.use(express.json())
+
+app.use(express.json());
+app.use(cookieparser());
 
 app.use("/api/auth/", authRoutes)
-
 
 app.listen( PORT,()=>{
     console.log("server is up on port:"+ PORT)
