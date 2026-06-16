@@ -55,5 +55,20 @@ export const logout = (req, res) => {
 }
 
 export const updateProfile =(req, res)=>{
-    
+    try {
+        const{profilePic} = req.body;
+        const userId = req.user._id;
+
+        if (!profilePic) {
+            return res.status(400).json({message:"updateProfile data is required"})
+        }
+        const uploadeResponse = await cloudinary.uploader.upload(profilePic)
+        const updatedUser = await User.findByIdAndUpdate(userId, {profilePic:uploadeResponse.secure_url},
+             {new:true})
+
+
+    } catch (error) {
+        console.error("Error uploading profile picture:", error);
+        res.status(500).json({ message: "Error uploading profile picture" });
+    }
 }

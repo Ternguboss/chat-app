@@ -11,7 +11,7 @@ const app = express()
 const PORT = process.env.PORT
 
 app.use(express.json());
-app.use(cookieparser());
+app.use(cookieParser());
 
 app.use("/api/auth", authRoutes)
 app.use("/api/message", messageRoutes)
