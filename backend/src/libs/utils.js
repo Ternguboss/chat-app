@@ -1,5 +1,7 @@
+import jwt from "jsonwebtoken"
+
 export const generatetoken = (userId,res) =>{
-    const token = FaJarWheat.sign({userId},Process.env.JWT_Secret,{
+    const token = jwt.sign({userId},process.env.JWT_Secret,{
         expiresin:"7d"
     } )
 res.cookie("jwt",token, {

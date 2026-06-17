@@ -17,7 +17,7 @@ export const  getUserForSideabar = async (req , res) => {
 export const getMessages = async (req , res) => {
     try {
         const {userToChatId} = req.params
-        const myId = req.user.id;
+        const myId = req.user._id;
 
         const messages = await message.find({
             $or:[{senderId:myId, receiver:userToChatId},
@@ -34,22 +34,24 @@ export const getMessages = async (req , res) => {
 export const sendMessages = async (req , res) => {
     try {
         const {text , image} = req.body;
-        const {id: recieverId} = req.params;
+        const {id: receiverId} = req.params;
         const senderId = req.user._id;
+        
 
         let imageURL;
         if(image){
             // upload base64 image to cloudinary
             const UploadResponse = await cloudinary.uploader.upload(image)
-            imageURL = UploadResponse.secureUrl;
+            imageURL = UploadResponse.secure_url;
+
         }
+    
         const newMessage = new message({
             senderId,
-            recieverId,
+            receiverId,
             text,
             image:imageURL,
-        });
-        
+        });       
         await newMessage.save();
 
         // real-time functionaliy with socket.io

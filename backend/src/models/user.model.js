@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { stringify } from "postcss";
 
 const userSchema = new mongoose.Schema(
     {
@@ -9,7 +8,7 @@ const userSchema = new mongoose.Schema(
             unique:true,
 
         },
-        Fullname:{
+        fullname:{
             type:String,
             required: true,
         },
@@ -27,3 +26,5 @@ const userSchema = new mongoose.Schema(
 )
 const User = mongoose.model("User", userSchema)
 export default User
+
+
