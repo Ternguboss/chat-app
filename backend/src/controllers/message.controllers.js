@@ -1,4 +1,4 @@
-import User from "../models/user.model";
+import User from "../models/user.model.js";
 import messages from "../models/message.model.js";
 import { json } from "express";
 

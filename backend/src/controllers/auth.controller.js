@@ -1,50 +1,51 @@
-import { generatetoken } from "../libs/utils.js"
-import User from "../models/user.model.js"
-import bcrypt from "bcryptjs"
+import { generatetoken } from "../libs/utils.js";
+import User from "../models/user.model.js";
+import bcrypt from "bcryptjs";
+import cloudinary from "../libs/cloudinary.js"; 
 
 export const signup = async (req, res) => {
-    const { Fullname, password, profilePic, email } = req.body
+    const { fullname, password, profilePic, email } = req.body;
     try {
         if (password.length < 6 ) {
-            return res.status(400).json({ message: "password must be at least 6 letters long" })
+            return res.status(400).json({ message: "password must be at least 6 letters long" });
         }
         
         // 1. Check if user already exists
-        const user = await User.findOne({ email })
-        if (user) return res.status(400).json({ message: "email already exists" }) // Fixed 'User' to 'user'
+        const user = await User.findOne({ email });
+        if (user) return res.status(400).json({ message: "email already exists" }); 
 
         // 2. Hash password
-        const salt = await bcrypt.genSalt(10)
-        const hashedPassword = await bcrypt.hash(password, salt)
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
 
         // 3. Create new instance using the 'User' model
-        const newUser = new User({ // Fixed 'newUser(' to 'new User('
-            Fullname,
+        const newUser = new User({ 
+            fullname,
             email,
             password: hashedPassword,
-            profilePic // Added this so profilePic actually gets saved!
-        })
+            profilePic 
+        });
 
         if (newUser) {
             // generate jwt token
-            generatetoken(newUser._id, res)
+            generatetoken(newUser._id, res);
             await newUser.save();
             
             res.status(201).json({
                 _id: newUser._id,
-                Fullname: newUser.Fullname,
+                fullname: newUser.fullname,
                 email: newUser.email,
                 profilePic: newUser.profilePic,
-            })
+            });
         } else {
-            res.status(400).json({ message: "invalid user data" })
+            res.status(400).json({ message: "invalid user data" });
         }
 
     } catch (error) {
-        console.log("error in signup controller", error.message)
-        res.status(500).json({ message: "internal server error" })
+        console.log("error in signup controller", error.message);
+        res.status(500).json({ message: "internal server error" });
     }
-}
+};
 
 export const login = async (req, res) => {
   const { email, password } = req.body;
@@ -60,11 +61,11 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    generateToken(user._id, res);
+    generatetoken(user._id, res); // Fixed case sensitivity (lowercase 't')
 
     res.status(200).json({
       _id: user._id,
-      fullName: user.fullName,
+      fullname: user.fullname, // Matches 'fullname' structure from signup
       email: user.email,
       profilePic: user.profilePic,
     });
@@ -73,7 +74,6 @@ export const login = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
-
 
 export const logout = (req, res) => {
   try {
@@ -85,25 +85,29 @@ export const logout = (req, res) => {
   }
 };
 
-
-export const updateProfile =(req, res)=>{
+// Added 'async' here to fix the SyntaxError
+export const updateProfile = async (req, res) => {
     try {
-        const{profilePic} = req.body;
+        const { profilePic } = req.body;
         const userId = req.user._id;
 
         if (!profilePic) {
-            return res.status(400).json({message:"updateProfile data is required"})
+            return res.status(400).json({ message: "updateProfile data is required" });
         }
-        const uploadeResponse = await cloudinary.uploader.upload(profilePic)
-        const updatedUser = await User.findByIdAndUpdate(userId, {profilePic:uploadeResponse.secure_url},
-             {new:true})
+        
+        const uploadeResponse = await cloudinary.uploader.upload(profilePic);
+        const updatedUser = await User.findByIdAndUpdate(
+            userId, 
+            { profilePic: uploadeResponse.secure_url },
+            { new: true }
+        );
 
         res.status(200).json(updatedUser);
     } catch (error) {
         console.error("Error uploading profile picture:", error);
         res.status(500).json({ message: "Error uploading profile picture" });
     }
-}
+};
 
 export const checkAuth = (req, res) => {
     try {
@@ -112,4 +116,4 @@ export const checkAuth = (req, res) => {
         console.error("Error checking authentication:", error);
         res.status(500).json({ message: "Error checking authentication" });
     }
-}
+};
