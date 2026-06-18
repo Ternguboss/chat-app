@@ -10,8 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "hot": "^0.0.7",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.4",
+    "react-router-dom": "^7.18.0",
+    "toast": "^0.5.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
