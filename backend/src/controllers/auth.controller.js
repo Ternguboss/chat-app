@@ -20,7 +20,7 @@ export const signup = async (req, res) => {
 
         // 3. Create new instance using the 'User' model
         const newUser = new User({ 
-            fullname,
+           fullname,
             email,
             password: hashedPassword,
             profilePic 
